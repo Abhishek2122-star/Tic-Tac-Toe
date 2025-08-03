@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic Tac Toe - Modern UI</title>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        text-align: center;
+        background: linear-gradient(135deg, #74ABE2, #5563DE);
+        color: white;
+        margin: 0;
+        padding: 0;
+    }
+    h1 {
+        margin-top: 20px;
+        font-size: 2.5rem;
+    }
+    .scoreboard {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-top: 10px;
+        font-size: 1.2rem;
+    }
+    .board {
+        display: grid;
+        grid-template-columns: repeat(3, 120px);
+        gap: 10px;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    .cell {
+        width: 120px;
+        height: 120px;
+        font-size: 36px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 2px solid white;
+        cursor: pointer;
+        color: white;
+        border-radius: 12px;
+        transition: transform 0.2s ease, background 0.3s ease;
+    }
+    .cell:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+    }
+    .cell:disabled {
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+    .winner {
+        background: #4CAF50 !important;
+    }
+    #resetBtn {
+        margin-top: 25px;
+        padding: 12px 25px;
+        font-size: 16px;
+        background: #FF5722;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+    #resetBtn:hover {
+        background: #E64A19;
+    }
+</style>
+</head>
+<body>
+
+<h1>🎮 Tic Tac Toe</h1>
+
+<div class="scoreboard">
+    <div>Player X: <span id="scoreX">0</span></div>
+    <div>Player O: <span id="scoreO">0</span></div>
+</div>
+
+<div class="board" id="board"></div>
+
+<button id="resetBtn">🔄 Reset Game</button>
+
+<script>
+    const board = document.getElementById("board");
+    let currentPlayer = "X";
+    let cells = [];
+    let scoreX = 0;
+    let scoreO = 0;
+
+    // Create 3x3 board
+    for (let i = 0; i < 9; i++) {
+        const btn = document.createElement("button");
+        btn.classList.add("cell");
+        btn.addEventListener("click", () => makeMove(btn));
+        board.appendChild(btn);
+        cells.push(btn);
+    }
+
+    function makeMove(cell) {
+        if (cell.textContent === "") {
+            cell.textContent = currentPlayer;
+            cell.disabled = true;
+
+            if (checkWinner()) {
+                if (currentPlayer === "X") {
+                    scoreX++;
+                    document.getElementById("scoreX").textContent = scoreX;
+                } else {
+                    scoreO++;
+                    document.getElementById("scoreO").textContent = scoreO;
+                }
+                highlightWinner();
+                setTimeout(() => alert(`🎉 Player ${currentPlayer} wins!`), 200);
+            } else if (cells.every(c => c.textContent !== "")) {
+                setTimeout(() => alert("It's a draw!"), 200);
+            } else {
+                currentPlayer = currentPlayer === "X" ? "O" : "X";
+            }
+        }
+    }
+
+    function checkWinner() {
+        const winPatterns = [
+            [0,1,2], [3,4,5], [6,7,8],
+            [0,3,6], [1,4,7], [2,5,8],
+            [0,4,8], [2,4,6]
+        ];
+        return winPatterns.some(pattern => {
+            const [a, b, c] = pattern;
+            return cells[a].textContent &&
+                   cells[a].textContent === cells[b].textContent &&
+                   cells[a].textContent === cells[c].textContent;
+        });
+    }
+
+    function highlightWinner() {
+        const winPatterns = [
+            [0,1,2], [3,4,5], [6,7,8],
+            [0,3,6], [1,4,7], [2,5,8],
+            [0,4,8], [2,4,6]
+        ];
+        winPatterns.forEach(pattern => {
+            const [a, b, c] = pattern;
+            if (cells[a].textContent &&
+                cells[a].textContent === cells[b].textContent &&
+                cells[a].textContent === cells[c].textContent) {
+                cells[a].classList.add("winner");
+                cells[b].classList.add("winner");
+                cells[c].classList.add("winner");
+            }
+        });
+    }
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+        cells.forEach(cell => {
+            cell.textContent = "";
+            cell.disabled = false;
+            cell.classList.remove("winner");
+        });
+        currentPlayer = "X";
+    });
+</script>
+
+</body>
+</html>
